@@ -2,27 +2,22 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../models/doctor.dart';
 
-class DoctorCard extends StatefulWidget {
+class DoctorCard extends StatelessWidget {
   final Doctor doctor;
   final VoidCallback? onTap;
+  final VoidCallback? onFavoriteToggle;
 
   const DoctorCard({
     super.key,
     required this.doctor,
     this.onTap,
+    this.onFavoriteToggle,
   });
-
-  @override
-  State<DoctorCard> createState() => _DoctorCardState();
-}
-
-class _DoctorCardState extends State<DoctorCard> {
-  bool _isFavorite = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
@@ -34,19 +29,17 @@ class _DoctorCardState extends State<DoctorCard> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                widget.doctor.imageUrl,
+              child: Image.network(
+                doctor.avatarUrl,
                 width: 55,
                 height: 55,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                return Container(
+                errorBuilder: (_, _, _) => Container(
                   width: 55,
                   height: 55,
                   color: AppColors.backgroundGrey,
                   child: const Icon(Icons.person, color: AppColors.primary),
-                );
-              },
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -55,7 +48,7 @@ class _DoctorCardState extends State<DoctorCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.doctor.name,
+                    doctor.name,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -64,7 +57,7 @@ class _DoctorCardState extends State<DoctorCard> {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    widget.doctor.specialty,
+                    doctor.specialty,
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -78,7 +71,7 @@ class _DoctorCardState extends State<DoctorCard> {
                       const SizedBox(width: 3),
                       Expanded(
                         child: Text(
-                          widget.doctor.distance,
+                          doctor.distance,
                           style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.textSecondary,
@@ -91,27 +84,11 @@ class _DoctorCardState extends State<DoctorCard> {
                 ],
               ),
             ),
-            // Buton favorite funcțional
             GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isFavorite = !_isFavorite;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      _isFavorite
-                          ? 'Added to favorites'
-                          : 'Removed from favorites',
-                    ),
-                    backgroundColor: AppColors.primary,
-                    duration: const Duration(seconds: 1),
-                  ),
-                );
-              },
+              onTap: onFavoriteToggle,
               child: Icon(
-                _isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: _isFavorite ? Colors.red : AppColors.textSecondary,
+                doctor.isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: doctor.isFavorite ? Colors.red : AppColors.textSecondary,
                 size: 22,
               ),
             ),

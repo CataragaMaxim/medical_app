@@ -1,19 +1,30 @@
+import 'doctor.dart';
+
 class Appointment {
-  final String doctorName;
-  final String specialty;
-  final String doctorImage;
+  final String title;
   final String date;
   final String time;
-  final double payment;
-  final String type; // 'video', 'chat', 'phone'
+  final Doctor doctor;
 
-  Appointment({
-    required this.doctorName,
-    required this.specialty,
-    required this.doctorImage,
+  const Appointment({
+    required this.title,
     required this.date,
     required this.time,
-    required this.payment,
-    required this.type,
+    required this.doctor,
   });
+
+  factory Appointment.fromJson(Map<String, dynamic> json) {
+    return Appointment(
+      title: json['title'] as String,
+      date: json['date'] as String,
+      time: json['time'] as String,
+      doctor: Doctor.fromJson({
+        'id': 'appointment-doctor',
+        'name': json['doctor']['name'],
+        'specialty': json['doctor']['specialty'],
+        'distance': '',
+        'avatarUrl': json['doctor']['avatarUrl'],
+      }),
+    );
+  }
 }

@@ -1,5 +1,5 @@
 name: medical_app
-description: "A new Flutter project."
+description: "A medical app"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -30,6 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
+  flutter_svg: ^2.0.10
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -58,7 +61,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
+    - assets/data/lab v2.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

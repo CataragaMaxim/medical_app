@@ -14,20 +14,24 @@ class AppointmentScreen extends StatefulWidget {
 class _AppointmentScreenState extends State<AppointmentScreen> {
   int _selectedHourIndex = 1;
   int _selectedDateIndex = 0;
-  bool _isFavorite = false;
 
-  final List<String> _hours = ['10:00 AM', '11:00 AM', '12:00 PM'];
+  final List<String> _hours = ['10.00 AM', '11.00 AM', '12.00 PM'];
   final List<String> _dates = ['Sun 4', 'Mon 5', 'Tue 6'];
 
-  // Datele doctorului (din parametru sau default)
-  Doctor get _doctor => widget.doctor ?? Doctor(
-    name: 'Dr.Upul',
+  // Doctorul primit sau default
+  Doctor get _doctor => widget.doctor ?? const Doctor(
+    id: 'default-doctor',
+    name: 'Dr. Upul',
     specialty: 'Denteeth',
-    imageUrl: 'assets/images/doctor1.jpg',
-    distance: '800M',
-    location: '800M',
+    distance: '',
+    avatarUrl: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54',
     price: 120.0,
   );
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,19 +53,6 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(
-              _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: _isFavorite ? Colors.red : AppColors.textPrimary,
-            ),
-            onPressed: () {
-              setState(() {
-                _isFavorite = !_isFavorite;
-              });
-            },
-          ),
-        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -100,87 +91,23 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     );
   }
 
-  // Confirmare programare
-  void _bookAppointment() {
-    final date = _dates[_selectedDateIndex];
-    final hour = _hours[_selectedHourIndex];
-
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: const Row(
-          children: [
-            Icon(Icons.check_circle, color: AppColors.primary, size: 28),
-            SizedBox(width: 10),
-            Text('Success'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Your appointment has been booked!'),
-            const SizedBox(height: 15),
-            _detailRow('Doctor', _doctor.name),
-            _detailRow('Date', date),
-            _detailRow('Time', hour),
-            _detailRow('Payment', '\$${_doctor.price.toStringAsFixed(2)}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'OK',
-              style: TextStyle(color: AppColors.primary),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _detailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary)),
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
+  // ============ DOCTOR INFO ============
   Widget _buildDoctorInfo() {
     return Row(
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(15),
-          child: Image.asset(
-            _doctor.imageUrl,
+          child: Image.network(
+            _doctor.avatarUrl,
             width: 90,
             height: 100,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: 90,
-                height: 100,
-                color: AppColors.backgroundGrey,
-                child: const Icon(Icons.person, color: AppColors.primary, size: 40),
-              );
-            },
+            errorBuilder: (_, _, _) => Container(
+              width: 90,
+              height: 100,
+              color: AppColors.backgroundGrey,
+              child: const Icon(Icons.person, size: 40, color: AppColors.primary),
+            ),
           ),
         ),
         const SizedBox(width: 15),
@@ -244,6 +171,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     );
   }
 
+  // ============ DIALOGS ============
   void _showChatDialog() {
     showModalBottomSheet(
       context: context,
@@ -266,10 +194,11 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.asset(
-                        _doctor.imageUrl,
+                      child: Image.network(
+                        _doctor.avatarUrl,
                         width: 40,
                         height: 40,
+                        fit: BoxFit.cover,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -370,7 +299,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
           children: [
             CircleAvatar(
               radius: 40,
-              backgroundImage: AssetImage(_doctor.imageUrl),
+              backgroundImage: NetworkImage(_doctor.avatarUrl),
             ),
             const SizedBox(height: 15),
             Text('Calling ${_doctor.name}...'),
@@ -405,7 +334,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
           children: [
             CircleAvatar(
               radius: 40,
-              backgroundImage: AssetImage(_doctor.imageUrl),
+              backgroundImage: NetworkImage(_doctor.avatarUrl),
             ),
             const SizedBox(height: 15),
             Text('Video calling ${_doctor.name}...'),
@@ -426,6 +355,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     );
   }
 
+  // ============ PAYMENT ============
   Widget _buildPayment() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -439,7 +369,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
           ),
         ),
         Text(
-          '\$${_doctor.price.toStringAsFixed(2)}',
+          '\$${(_doctor.price ?? 120.0).toStringAsFixed(2)}',
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -450,6 +380,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     );
   }
 
+  // ============ DETAILS ============
   Widget _buildDetails() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,10 +396,11 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
         SizedBox(height: 10),
         Text(
           'Worem ipsum dolor sit amet, consectetur adipiscing elit. '
-              'Nunc vulputate libero et velit interdum, ac aliquet odio mattis. '
+              'Nunc vulputate leo et velit interdum, ac aliquet odio mattis. '
               'Class aptent taciti sociosqu ad litora torquent per conubia nostra, '
               'per inceptos himenaeos. Curabitur tempus urna at turpis condimentum '
-              'lobortis.',
+              'lobortis. Ut commodo efficitur neque. Ut diam quam, semper iaculis '
+              'condimentum et, vestibulum eu nisl.',
           style: TextStyle(
             fontSize: 13,
             color: AppColors.textSecondary,
@@ -479,6 +411,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     );
   }
 
+  // ============ WORKING HOURS ============
   Widget _buildWorkingHours() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -553,6 +486,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     );
   }
 
+  // ============ DATE ============
   Widget _buildDate() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -569,9 +503,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
               ),
             ),
             GestureDetector(
-              onTap: () {
-                _showCalendarDialog();
-              },
+              onTap: _showCalendarDialog,
               child: const Text(
                 'See All',
                 style: TextStyle(fontSize: 13, color: AppColors.primary),
@@ -639,19 +571,84 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
             firstDate: DateTime.now(),
             lastDate: DateTime.now().add(const Duration(days: 365)),
             onDateChanged: (date) {
-              setState(() {
-                _selectedDateIndex = 0;
-              });
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Selected: ${date.day}/${date.month}/${date.year}'),
+                  content: Text(
+                    'Selected: ${date.day}/${date.month}/${date.year}',
+                  ),
                   backgroundColor: AppColors.primary,
                 ),
               );
             },
           ),
         ),
+      ),
+    );
+  }
+
+  // ============ BOOK APPOINTMENT ============
+  void _bookAppointment() {
+    final date = _dates[_selectedDateIndex];
+    final hour = _hours[_selectedHourIndex];
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.check_circle, color: AppColors.primary, size: 28),
+            SizedBox(width: 10),
+            Text('Success'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Your appointment has been booked!'),
+            const SizedBox(height: 15),
+            _detailRow('Doctor', _doctor.name),
+            _detailRow('Date', date),
+            _detailRow('Time', hour),
+            _detailRow(
+              'Payment',
+              '\$${(_doctor.price ?? 120.0).toStringAsFixed(2)}',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'OK',
+              style: TextStyle(color: AppColors.primary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _detailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(color: AppColors.textSecondary)),
+          Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
       ),
     );
   }
